@@ -4,44 +4,52 @@ var VerifyToken = require('../services/verifyToken');
 var Stack = require('stackjs');
 var User = require('../models/users')
 var s = new Stack();
-
+var Balanced = require('../models/balanced'); 
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
 router.post('/balanced', VerifyToken ,function(req,res,next){
+  console.log('In balanced');
+  console.log(req.email);
+  console.log(req.name);
 	if(!req.body.expression){
 		return res.status(400).send({'status':false,message:'Required parameters not passed'});
 	}
 	else{
 		var response = areParanthesisBalanced(req.body.expression)
 		if(response == 'balanced'){
-      User.findOneAndUpdate({ _id: req.userId,status:1 }, { $set: { attempts: 0 }})
-        .select('email attempts')
+      // console.log('successfull attempt');
+      Balanced.findOneAndUpdate({ email: req.email,expression:req.body.expression}, { $inc: { attempts: 1 }})
+        .select('email name expr attempts')
         .exec(function(err, db_res) { 
           if (err) { 
             throw err; 
           } 
           else { 
-            res.send({username:db_res.name,message:response});
+            if(db_res == null){
+              console.log('inside create block')
+                  Balanced.create({
+                    name : req.name,
+                    email : req.email,
+                    expression : req.body.expression,
+                    message:'Balanced expression'
+                  },
+                  function (err, user) {
+                    console.log(err);
+                    console.log(user);
+                    if (err) return res.status(500).send("Some error occured while saving data.");
+                     else 
+                      return res.status(200).send({username:req.name,message:'expression balanced',attempts:1});
+                  });
+            }else{
+            res.status(200).send({username:req.name,message:'expression balanced',attempts:db_res.attempts+1});
+            }
           } 
       });
-
-			// console.log('successfull attempt');
 		}
-		else{
-      console.log(req.userId)
-			User.findOneAndUpdate({ _id: req.userId,status:1 }, { $inc: { attempts: 1 }})
-        .select('email attempts name')
-        .exec(function(err, db_res) { 
-          if (err) { 
-            throw err; 
-          } 
-          else { 
-      			res.send({username:db_res.name,'message':response,attempts:db_res.attempts+1});
-          } 
-      });
-			// console.log('unsuccessfull attempt');
+		else{      
+      res.status(400).send({status:false,'message':response});
 		}
 	}
 })
