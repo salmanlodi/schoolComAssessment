@@ -24,12 +24,12 @@ https://nodejs.org/en/
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
+A step by step series of examples that tell you how to get a development environment running
 
 follow the below process:
 
 ```
-After cloning get into the project directory by command (cd ./schoolcomAssessment/)
+After cloning, get into the project directory by command (cd ./schoolcomAssessment/)
 ```
 
 And then
@@ -97,7 +97,7 @@ Headers : x-access-token(jwt token returned at admin role login)
 
 * **Api for checking balanced or unbalanced expression**
 
-1. Get all consumers
+1. Balanced API
 
 ```
 url: http://localhost:3000/balanced
@@ -113,6 +113,6 @@ The database is deployed on mlabs in testing environment.
 
 This system is built for assessment purpose and will require additional work to deploy on live environment
 
-## Authors
+## Author
 
 * **SALMAN LODI**  - (https://github.com/salmanlodi)
